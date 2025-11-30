@@ -9,9 +9,18 @@ require 'config/conexion.php';
 $correo = $_POST['correo'];
 $contraseña = $_POST['contraseña'];
 
-// 3. Buscar el usuario en la base de datos
-$sql = "SELECT * FROM usuarios WHERE correo = '$correo'";
-$resultado = $conexion->query($sql);
+// 3. Buscar el usuario DE FORMA SEGURA (Prepared Statement)
+// Preparamos la plantilla de la consulta con un signo de interrogación (?)
+$sql = "SELECT id_usuario, correo, contraseña, rol FROM usuarios WHERE correo = ?";
+
+$stmt = $conexion->prepare($sql); // Preparamos la sentencia
+
+// Vinculamos el parámetro (la "s" significa que es un String)
+$stmt->bind_param("s", $correo); 
+
+$stmt->execute(); // Ejecutamos la consulta
+
+$resultado = $stmt->get_result(); // Obtenemos el resultado
 
 if ($resultado->num_rows > 0) {
 
