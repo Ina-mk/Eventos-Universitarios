@@ -1,11 +1,6 @@
 <?php
 // Conectar con la bd
-$conexion = new mysqli("localhost", "root", "", "eventos_db");
-
-// Verificar conexión
-if ($conexion->connect_error) {
-    die("Error de conexión: " . $conexion->connect_error);
-}
+require 'config/conexion.php';
 
 // Recibir datos del formulario
 $correo = $_POST['correo'];

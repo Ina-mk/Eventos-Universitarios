@@ -2,11 +2,8 @@
 session_start();
 
 // 1. Conectar a la base de datos
-$conexion = new mysqli("localhost", "root", "", "eventos_db");
-
-if ($conexion->connect_error) {
-    die("Error de conexión: " . $conexion->connect_error);
-}
+// Lo cambie para que no volvieramos a escribir lo mismo y cambiar varios archivos
+require 'config/conexion.php';
 
 // 2. Recibir datos del formulario
 $correo = $_POST['correo'];
