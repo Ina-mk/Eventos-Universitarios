@@ -17,58 +17,58 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <style>
-        :root {
-            --lavanda: #F3E8FF;
-            --morado-medio: #C9A7F5;
-            --morado-intenso: #8A2BE2;
-            --morado-oscuro: #5A189A;
-            --blanco: #FFFFFF;
-            --gris: #3A3A3A;
-        }
+    :root {
+        --azul-claro: #EAF2FF;
+        --azul-medio: #5DA9FF;
+        --azul-principal: #1E6FE8;
+        --azul-oscuro: #123C8C;
+        --blanco: #FFFFFF;
+        --gris: #3A3A3A;
+    }
 
-        body {
-            background-color: var(--lavanda);
-        }
+    body {
+        background-color: var(--azul-claro);
+    }
 
-        .navbar {
-            background-color: var(--morado-intenso) !important;
-        }
+    .navbar {
+        background-color: var(--azul-principal) !important;
+    }
 
-        .navbar-brand {
-            color: var(--blanco) !important;
-            font-weight: bold;
-        }
+    .navbar-brand {
+        color: var(--blanco) !important;
+        font-weight: bold;
+    }
 
-        .avatar-navbar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: 2px solid var(--blanco);
-            object-fit: cover;
-            margin-left: 15px;
-        }
+    .avatar-navbar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: 2px solid var(--blanco);
+        object-fit: cover;
+        margin-left: 15px;
+    }
 
-        .card {
-            border: none;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-            border-left: 5px solid var(--morado-intenso);
-        }
+    .card {
+        border: none;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        border-left: 5px solid var(--azul-principal);
+    }
 
-        .btn-primary {
-            background-color: var(--morado-intenso) !important;
-            border-color: var(--morado-intenso) !important;
-            font-size: 1.2rem;
-            padding: 15px 25px;
-            width: 100%;
-        }
+    .btn-primary {
+        background-color: var(--azul-principal) !important;
+        border-color: var(--azul-principal) !important;
+        font-size: 1.2rem;
+        padding: 15px 25px;
+        width: 100%;
+    }
 
-        .btn-primary:hover {
-            background-color: var(--morado-medio) !important;
-            border-color: var(--morado-medio) !important;
-            color: var(--gris);
-        }
+    .btn-primary:hover {
+        background-color: var(--azul-medio) !important;
+        border-color: var(--azul-medio) !important;
+        color: var(--gris);
+    }
+</style>
 
-    </style>
 </head>
 
 <body>
