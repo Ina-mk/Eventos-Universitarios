@@ -101,7 +101,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <a href="logout.php" class="btn btn-primary">Gestionar eventos</a>
+               <a href="gestionar_eventos_admin.php" class="btn btn-primary">Gestionar eventos</a>
                 </div>
 
             </div>

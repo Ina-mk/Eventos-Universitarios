@@ -1,10 +1,23 @@
 <?php
 session_start();
 
+
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'estudiante') {
     header("Location: login.php");
     exit;
 }
+include "config/conexion.php";
+
+// ===============================
+// CONSULTAR EVENTOS DISPONIBLES
+// ===============================
+$consulta = "
+    SELECT *
+    FROM eventos
+    ORDER BY fecha ASC
+";
+
+$resultado = $conexion->query($consulta);
 ?>
 
 <!DOCTYPE html>
@@ -92,53 +105,33 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'estudiante') {
 
     <div class="row">
 
-        <!-- EVENTO 1 -->
+<?php if ($resultado->num_rows > 0): ?>
+    <?php while ($evento = $resultado->fetch_assoc()): ?>
         <div class="col-md-4 mb-4">
             <div class="card p-3 h-100">
-                <h5>Conferencia de Inteligencia Artificial</h5>
+
+                <h5><?= htmlspecialchars($evento['nombre']) ?></h5>
+
                 <p class="text-muted mb-1">
-                    <i class="bi bi-calendar-event"></i> 25 de mayo 2025
-                </p>
-                <p class="text-muted">
-                    <i class="bi bi-geo-alt"></i> Auditorio ESCOM
+                    <i class="bi bi-calendar-event"></i>
+                    <?= htmlspecialchars($evento['fecha']) ?>
                 </p>
 
-                <a href="#" class="btn btn-primary mt-auto">Ver detalles</a>
+                <p class="text-muted">
+                    <i class="bi bi-geo-alt"></i>
+                    <?= htmlspecialchars($evento['lugar']) ?>
+                </p>
+
+                <a href="ver_evento.php?id=<?= $evento['id_evento'] ?>"
+                   class="btn btn-primary mt-auto">
+                    Ver detalles
+                </a>
+
             </div>
         </div>
-
-        <!-- EVENTO 2 -->
-        <div class="col-md-4 mb-4">
-            <div class="card p-3 h-100">
-                <h5>Torneo Deportivo Interescolar</h5>
-                <p class="text-muted mb-1">
-                    <i class="bi bi-calendar-event"></i> 2 de junio 2025
-                </p>
-                <p class="text-muted">
-                    <i class="bi bi-geo-alt"></i> Canchas ESCOM
-                </p>
-
-                <a href="#" class="btn btn-primary mt-auto">Ver detalles</a>
-            </div>
-        </div>
-
-        <!-- EVENTO 3 -->
-        <div class="col-md-4 mb-4">
-            <div class="card p-3 h-100">
-                <h5>Feria Cultural</h5>
-                <p class="text-muted mb-1">
-                    <i class="bi bi-calendar-event"></i> 10 de junio 2025
-                </p>
-                <p class="text-muted">
-                    <i class="bi bi-geo-alt"></i> Letras ESCOM
-                </p>
-
-                <a href="#" class="btn btn-primary mt-auto">Ver detalles</a>
-            </div>
-        </div>
-
-    </div>
-</div>
-
+    <?php endwhile; ?>
+<?php else: ?>
+    <p class="text-center">No hay eventos disponibles.</p>
+<?php endif; ?>
 </body>
 </html>

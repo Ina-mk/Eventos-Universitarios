@@ -3,11 +3,14 @@
 // INICIAR SESIÓN Y VERIFICAR ROL
 // ===============================
 session_start();
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'organizador') {
+
+if (
+    !isset($_SESSION['rol']) ||
+    !in_array($_SESSION['rol'], ['organizador', 'estudiante'])
+) {
     header("Location: login.php");
     exit;
 }
-
 // ===============================
 // CONEXIÓN A LA BASE DE DATOS
 // ===============================
@@ -50,11 +53,17 @@ $evento = $result->fetch_assoc();
         <p><strong>Descripción:</strong></p>
         <p><?= nl2br(htmlspecialchars($evento['descripcion'])) ?></p>
 
-        <div class="mt-4">
-            <a href="panel_organizador.php" class="btn btn-primary">Regresar al panel</a>
-            <a href="editar_evento.php?id=<?= $evento['id_evento'] ?>" class="btn btn-secondary">Editar evento</a>
-            <a href="eliminar_evento.php?id=<?= $evento['id_evento'] ?>" class="btn btn-danger">Eliminar evento</a>
-        </div>
+<div class="mt-4">
+
+    <?php if ($_SESSION['rol'] === 'organizador'): ?>
+        <a href="panel_organizador.php" class="btn btn-primary">Regresar al panel</a>
+        <a href="editar_evento.php?id=<?= $evento['id_evento'] ?>" class="btn btn-secondary">Editar evento</a>
+        <a href="eliminar_evento.php?id=<?= $evento['id_evento'] ?>" class="btn btn-danger">Eliminar evento</a>
+    <?php else: ?>
+        <a href="panel_estudiante.php" class="btn btn-primary">Regresar a eventos</a>
+    <?php endif; ?>
+
+</div>
     </div>
 </div>
 
