@@ -1,23 +1,67 @@
 <?php
+// ===============================
+// PANEL DEL ESTUDIANTE
+// Muestra todos los eventos y recomendaciones según intereses
+// ===============================
+
 session_start();
 
-
+// ===============================
+// VERIFICAR SESIÓN Y ROL
+// ===============================
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'estudiante') {
     header("Location: login.php");
     exit;
 }
+
 include "config/conexion.php";
 
 // ===============================
-// CONSULTAR EVENTOS DISPONIBLES
+// OBTENER ID DEL ESTUDIANTE
 // ===============================
-$consulta = "
+$id_usuario = $_SESSION['id_usuario'];
+
+// ===============================
+// OBTENER INTERESES DEL ESTUDIANTE
+// ===============================
+$consulta_intereses = "
+    SELECT intereses 
+    FROM perfil_estudiante 
+    WHERE id_usuario = $id_usuario
+";
+$res = $conexion->query($consulta_intereses);
+
+$intereses = [];
+if ($res->num_rows > 0) {
+    $fila = $res->fetch_assoc();
+    // Suponiendo que los intereses están separados por comas
+    $intereses = array_map('trim', explode(',', $fila['intereses']));
+}
+
+// ===============================
+// CONSULTAR EVENTOS RECOMENDADOS SEGÚN INTERESES
+// ===============================
+$resultado_recomendados = null;
+if (!empty($intereses)) {
+    $intereses_in = "'" . implode("','", $intereses) . "'";
+    $consulta_recomendados = "
+        SELECT *
+        FROM eventos
+        WHERE categoria IN ($intereses_in)
+        ORDER BY fecha ASC
+    ";
+    $resultado_recomendados = $conexion->query($consulta_recomendados);
+}
+
+// ===============================
+// CONSULTAR TODOS LOS EVENTOS DISPONIBLES
+// ===============================
+$consulta_todos = "
     SELECT *
     FROM eventos
     ORDER BY fecha ASC
 ";
-
-$resultado = $conexion->query($consulta);
+$resultado_todos = $conexion->query($consulta_todos);
 ?>
 
 <!DOCTYPE html>
@@ -35,44 +79,31 @@ $resultado = $conexion->query($consulta);
             --azul-claro: #eaf2ff;
             --azul-principal: #2b90e2;
             --azul-secundario: #558fda;
-            --azul-oscuro: #1f5fa8;
             --blanco: #ffffff;
             --gris: #555;
         }
 
-        body {
-            background-color: var(--azul-claro);
-        }
-
-        .navbar {
-            background-color: var(--azul-principal) !important;
-        }
-
-        .navbar-brand {
-            color: var(--blanco) !important;
-            font-weight: bold;
-        }
-
+        body { background-color: var(--azul-claro); }
+        .navbar { background-color: var(--azul-principal) !important; }
+        .navbar-brand { color: var(--blanco) !important; font-weight: bold; }
         .card {
             border: none;
             border-left: 5px solid var(--azul-principal);
             box-shadow: 0 3px 10px rgba(0,0,0,0.15);
         }
-
         .btn-primary {
             background-color: var(--azul-principal) !important;
             border-color: var(--azul-principal) !important;
         }
-
         .btn-primary:hover {
             background-color: var(--azul-secundario) !important;
             border-color: var(--azul-secundario) !important;
         }
-
         .btn-outline-light:hover {
             background-color: var(--blanco);
             color: var(--azul-principal);
         }
+        h3 { margin-top: 40px; }
     </style>
 </head>
 
@@ -82,56 +113,58 @@ $resultado = $conexion->query($consulta);
 <nav class="navbar navbar-expand-lg">
     <div class="container">
         <a class="navbar-brand" href="#">Eventos ESCOM</a>
-
-        <!-- Zona derecha -->
         <div class="ms-auto d-flex align-items-center gap-3">
-
-            <!-- Botón Mi Perfil -->
             <a href="perfil_estudiante.php" class="btn btn-outline-light btn-sm">
                 <i class="bi bi-person-circle"></i> Mi perfil
             </a>
-
-            <!-- Rol -->
             <span class="text-white">Estudiante</span>
             <i class="bi bi-mortarboard-fill text-white fs-4"></i>
         </div>
     </div>
 </nav>
 
-<!-- CONTENIDO -->
 <div class="container mt-5">
 
-    <h2 class="text-center mb-4">Eventos disponibles</h2>
-
-    <div class="row">
-
-<?php if ($resultado->num_rows > 0): ?>
-    <?php while ($evento = $resultado->fetch_assoc()): ?>
-        <div class="col-md-4 mb-4">
-            <div class="card p-3 h-100">
-
-                <h5><?= htmlspecialchars($evento['nombre']) ?></h5>
-
-                <p class="text-muted mb-1">
-                    <i class="bi bi-calendar-event"></i>
-                    <?= htmlspecialchars($evento['fecha']) ?>
-                </p>
-
-                <p class="text-muted">
-                    <i class="bi bi-geo-alt"></i>
-                    <?= htmlspecialchars($evento['lugar']) ?>
-                </p>
-
-                <a href="ver_evento.php?id=<?= $evento['id_evento'] ?>"
-                   class="btn btn-primary mt-auto">
-                    Ver detalles
-                </a>
-
-            </div>
+    <!-- ===============================
+         SECCIÓN: Eventos recomendados según intereses
+         =============================== -->
+    <?php if ($resultado_recomendados && $resultado_recomendados->num_rows > 0): ?>
+        <h3>Esto podría interesarte</h3>
+        <div class="row">
+            <?php while ($evento = $resultado_recomendados->fetch_assoc()): ?>
+                <div class="col-md-4 mb-4">
+                    <div class="card p-3 h-100">
+                        <h5><?= htmlspecialchars($evento['nombre']) ?></h5>
+                        <p class="text-muted mb-1"><i class="bi bi-calendar-event"></i> <?= htmlspecialchars($evento['fecha']) ?></p>
+                        <p class="text-muted"><i class="bi bi-geo-alt"></i> <?= htmlspecialchars($evento['lugar']) ?></p>
+                        <a href="ver_evento.php?id=<?= $evento['id_evento'] ?>" class="btn btn-primary mt-auto">Ver detalles</a>
+                    </div>
+                </div>
+            <?php endwhile; ?>
         </div>
-    <?php endwhile; ?>
-<?php else: ?>
-    <p class="text-center">No hay eventos disponibles.</p>
-<?php endif; ?>
+    <?php endif; ?>
+
+    <!-- ===============================
+         SECCIÓN: Todos los eventos disponibles
+         =============================== -->
+    <h3>Eventos disponibles</h3>
+    <div class="row">
+        <?php if ($resultado_todos->num_rows > 0): ?>
+            <?php while ($evento = $resultado_todos->fetch_assoc()): ?>
+                <div class="col-md-4 mb-4">
+                    <div class="card p-3 h-100">
+                        <h5><?= htmlspecialchars($evento['nombre']) ?></h5>
+                        <p class="text-muted mb-1"><i class="bi bi-calendar-event"></i> <?= htmlspecialchars($evento['fecha']) ?></p>
+                        <p class="text-muted"><i class="bi bi-geo-alt"></i> <?= htmlspecialchars($evento['lugar']) ?></p>
+                        <a href="ver_evento.php?id=<?= $evento['id_evento'] ?>" class="btn btn-primary mt-auto">Ver detalles</a>
+                    </div>
+                </div>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <p class="text-center">No hay eventos disponibles.</p>
+        <?php endif; ?>
+    </div>
+
+</div>
 </body>
 </html>

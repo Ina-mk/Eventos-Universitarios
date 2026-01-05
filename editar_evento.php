@@ -1,9 +1,17 @@
 <?php
 // ===============================
-// INICIAR SESIÓN Y VERIFICAR ROL ADMIN
+// editar_evento.php
+// Permite al admin o al organizador editar eventos
+// Los organizadores solo pueden editar sus propios eventos
+// ===============================
+
+// ===============================
+// INICIAR SESIÓN Y VERIFICAR ROL
 // ===============================
 session_start();
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
+
+// Solo admin y organizador pueden acceder
+if (!isset($_SESSION['rol']) || !in_array($_SESSION['rol'], ['admin','organizador'])) {
     header("Location: login.php");
     exit;
 }
@@ -28,6 +36,21 @@ if ($result->num_rows === 0) die("Evento no encontrado.");
 $evento = $result->fetch_assoc();
 
 // ===============================
+// SI EL USUARIO ES ORGANIZADOR, VERIFICAR QUE EL EVENTO LE PERTENEZCA
+// ===============================
+if ($_SESSION['rol'] === 'organizador') {
+    $id_usuario = $_SESSION['id_usuario'];
+
+    // Obtener el nombre del organizador
+    $res = $conexion->query("SELECT nombre FROM perfil_organizador WHERE id_usuario = $id_usuario");
+    $org = $res->fetch_assoc()['nombre'] ?? '';
+
+    if ($evento['organizador'] !== $org) {
+        die("No tienes permiso para editar este evento.");
+    }
+}
+
+// ===============================
 // GUARDAR CAMBIOS SI SE ENVÍA EL FORMULARIO
 // ===============================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -45,7 +68,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conexion->query($sql_update);
 
     // Redirigir de nuevo a la gestión de eventos con mensaje de éxito
-    header("Location: gestionar_eventos_admin.php?success=evento_actualizado");
+    if ($_SESSION['rol'] === 'admin') {
+        header("Location: gestionar_eventos_admin.php?success=evento_actualizado");
+    } else {
+        header("Location: panel_organizador.php?success=evento_actualizado");
+    }
     exit;
 }
 ?>
@@ -93,11 +120,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Botones: Cancelar / Guardar -->
             <div class="d-flex justify-content-between">
-                <a href="gestionar_eventos_admin.php" class="btn btn-secondary">Cancelar</a>
+                <?php if($_SESSION['rol'] === 'admin'): ?>
+                    <a href="gestionar_eventos_admin.php" class="btn btn-secondary">Cancelar</a>
+                <?php else: ?>
+                    <a href="panel_organizador.php" class="btn btn-secondary">Cancelar</a>
+                <?php endif; ?>
                 <button type="submit" class="btn btn-primary">Guardar Cambios</button>
             </div>
 
         </form>
+
+        <!-- ===============================
+             SECCIÓN: ESTUDIANTES INTERESADOS
+             SOLO PARA ORGANIZADORES
+             =============================== -->
+        <?php if($_SESSION['rol'] === 'organizador'): ?>
+            <h4 class="mt-5">Estudiantes interesados en esta categoría</h4>
+            <ul class="list-group mb-3">
+                <?php
+                // Suponiendo que hay columna 'categoria' en eventos
+                $categoria = $evento['categoria'] ?? '';
+
+                // Buscar estudiantes cuyo campo 'intereses' incluya la categoría del evento
+                $res_est = $conexion->query("
+                    SELECT nombre, correo 
+                    FROM perfil_estudiante 
+                    WHERE intereses LIKE '%$categoria%'
+                ");
+
+                if($res_est->num_rows > 0){
+                    while($est = $res_est->fetch_assoc()){
+                        echo "<li class='list-group-item'>{$est['nombre']} ({$est['correo']})</li>";
+                    }
+                } else {
+                    echo "<li class='list-group-item text-muted'>No hay estudiantes interesados aún.</li>";
+                }
+                ?>
+            </ul>
+        <?php endif; ?>
+
     </div>
 </div>
 
