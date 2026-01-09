@@ -99,6 +99,7 @@ $resultado_todos = $conexion->query($consulta_todos);
             background-color: var(--azul-secundario) !important;
             border-color: var(--azul-secundario) !important;
         }
+        /* Estilos para los botones del navbar */
         .btn-outline-light:hover {
             background-color: var(--blanco);
             color: var(--azul-principal);
@@ -113,12 +114,34 @@ $resultado_todos = $conexion->query($consulta_todos);
 <nav class="navbar navbar-expand-lg">
     <div class="container">
         <a class="navbar-brand" href="#">Eventos ESCOM</a>
-        <div class="ms-auto d-flex align-items-center gap-3">
-            <a href="perfil_estudiante.php" class="btn btn-outline-light btn-sm">
-                <i class="bi bi-person-circle"></i> Mi perfil
-            </a>
-            <span class="text-white">Estudiante</span>
-            <i class="bi bi-mortarboard-fill text-white fs-4"></i>
+        
+        <!-- Botón para móvil (hamburguesa) por si la pantalla es pequeña -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <div class="ms-auto d-flex align-items-center gap-2">
+                
+                <!-- Botón Mi Perfil -->
+                <a href="perfil_estudiante.php" class="btn btn-outline-light btn-sm d-flex align-items-center gap-2">
+                    <i class="bi bi-person-circle"></i> Mi perfil
+                </a>
+
+                <!-- Botón Cerrar Sesión (NUEVO) -->
+                <a href="logout.php" class="btn btn-danger btn-sm d-flex align-items-center gap-2">
+                    <i class="bi bi-box-arrow-right"></i> Salir
+                </a>
+
+                <!-- Separador visual -->
+                <div class="vr bg-white mx-2" style="height: 25px; opacity: 0.5;"></div>
+
+                <!-- Indicador de Rol -->
+                <div class="d-flex align-items-center text-white">
+                    <span class="me-2">Estudiante</span>
+                    <i class="bi bi-mortarboard-fill fs-4"></i>
+                </div>
+            </div>
         </div>
     </div>
 </nav>
@@ -129,7 +152,7 @@ $resultado_todos = $conexion->query($consulta_todos);
          SECCIÓN: Eventos recomendados según intereses
          =============================== -->
     <?php if ($resultado_recomendados && $resultado_recomendados->num_rows > 0): ?>
-        <h3>Esto podría interesarte</h3>
+        <h3><i class="bi bi-star-fill text-warning"></i> Esto podría interesarte</h3>
         <div class="row">
             <?php while ($evento = $resultado_recomendados->fetch_assoc()): ?>
                 <div class="col-md-4 mb-4">
@@ -161,10 +184,18 @@ $resultado_todos = $conexion->query($consulta_todos);
                 </div>
             <?php endwhile; ?>
         <?php else: ?>
-            <p class="text-center">No hay eventos disponibles.</p>
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    No hay eventos disponibles en este momento.
+                </div>
+            </div>
         <?php endif; ?>
     </div>
 
 </div>
+
+<!-- Scripts de Bootstrap (Necesarios para colapsar el menú en móviles) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

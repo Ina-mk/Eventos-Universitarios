@@ -1,12 +1,3 @@
-<?php
-session_start();
-
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
-    header("Location: login.php");
-    exit;
-}
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -39,13 +30,17 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
         font-weight: bold;
     }
 
-    .avatar-navbar {
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        border: 2px solid var(--blanco);
-        object-fit: cover;
-        margin-left: 15px;
+    /* Estilo para el link del dropdown en el navbar */
+    .nav-user-link {
+        color: var(--blanco) !important;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .nav-user-link:hover {
+        opacity: 0.9;
     }
 
     .card {
@@ -79,9 +74,26 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
 
             <a class="navbar-brand" href="#">Panel Admin</a>
 
-            <div class="ms-auto d-flex align-items-center">
-                <span class="text-white me-2">Administrador</span>
-                <i class="bi bi-person-circle text-white" style="font-size: 2.3rem; margin-left: 10px;"></i>
+            <!-- Menú de Usuario (Dropdown) -->
+            <div class="ms-auto dropdown">
+                <a href="#" class="nav-user-link dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="me-2">
+                        <?php echo isset($_SESSION['usuario']) ? $_SESSION['usuario'] : 'Administrador'; ?>
+                    </span>
+                    <i class="bi bi-person-circle" style="font-size: 2.3rem;"></i>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li><h6 class="dropdown-header">Opciones de cuenta</h6></li>
+                    <li><a class="dropdown-item" href="#">Mi Perfil</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <!-- Opción de Salir -->
+                    <li>
+                        <a class="dropdown-item text-danger" href="logout.php">
+                            <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+                        </a>
+                    </li>
+                </ul>
             </div>
 
         </div>
@@ -108,6 +120,9 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
 
         </div>
     </div>
+
+    <!-- SCRIPT DE BOOTSTRAP (Necesario para el dropdown) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
