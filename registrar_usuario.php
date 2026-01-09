@@ -1,4 +1,13 @@
 <?php
+
+
+/*echo 'POST<pre>';
+print_r($_POST);
+echo '</pre>';
+echo 'SESSION<pre>';
+print_r($_SESSION);
+echo '</pre>';
+exit;*/
 // ===============================
 // registrar_usuario.php
 // Permite al administrador registrar nuevos usuarios
@@ -10,7 +19,7 @@ session_start();
 // ===============================
 // VERIFICAR QUE EL USUARIO SEA ADMIN
 // ===============================
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
+if (!isset($_POST['rol']) || $_POST['rol'] !== 'admin') {
     header("Location: login.php");
     exit;
 }
